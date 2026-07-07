@@ -463,7 +463,7 @@
             112, 115, 119, 124, 131, 137, 142
         ];
 
-        const container = document.getElementById('textContainer');
+        const textContainer = document.getElementById('textContainer');
         const voiceIndicator = document.getElementById('voiceIndicator');
         const finalMessage = document.getElementById('finalMessage');
         let currentElement = null;
@@ -486,7 +486,7 @@
             const newLine = document.createElement('div');
             newLine.className = 'text-line';
             newLine.textContent = lines[index];
-            container.appendChild(newLine);
+            textContainer.appendChild(newLine);
 
             requestAnimationFrame(() => {
                 newLine.classList.add('active');
@@ -502,7 +502,7 @@
                 currentElement = null;
             }
             lastShownIndex = -1;
-            container.innerHTML = '';
+            textContainer.innerHTML = '';
             voiceIndicator.classList.remove('show');
             voiceIndicator.textContent = '';
             finalMessage.classList.remove('show');
@@ -517,7 +517,12 @@
         // ========== ГОЛОСОВЫЕ ==========
         const voiceFiles = [];
         for (let i = 1; i <= 9; i++) {
-            voiceFiles.push(document.getElementById('voice' + i));
+            const v = document.getElementById('voice' + i);
+            if (v) {
+                v.volume = 1.0;
+                v.preload = 'auto';
+                voiceFiles.push(v);
+            }
         }
 
         let currentVoiceIndex = 0;
@@ -525,8 +530,8 @@
         let allVoicesDone = false;
 
         // Петля: 2:28 – 2:50
-        const LOOP_START = 148;  // 2:28
-        const LOOP_END = 170;    // 2:50
+        const LOOP_START = 148;
+        const LOOP_END = 170;
 
         function stopAllVoices() {
             voiceFiles.forEach(v => {
@@ -542,12 +547,10 @@
 
         function playNextVoice() {
             if (currentVoiceIndex >= voiceFiles.length) {
-                // Все голосовые проиграны
                 voiceActive = false;
                 allVoicesDone = true;
                 loopActive = false;
                 mainAudio.volume = 0.75;
-                // Показываем финальный текст
                 showFinalMessage();
                 return;
             }
@@ -555,6 +558,7 @@
             const voice = voiceFiles[currentVoiceIndex];
             voice.currentTime = 0;
             voice.volume = 1.0;
+            voice.muted = false;
 
             voice.play().then(() => {
                 voiceActive = true;
@@ -564,12 +568,12 @@
             }).catch(e => {
                 console.log('Ошибка воспроизведения голосового:', e);
                 currentVoiceIndex++;
-                playNextVoice();
+                setTimeout(() => playNextVoice(), 200);
             });
 
             voice.onended = () => {
                 currentVoiceIndex++;
-                playNextVoice();
+                setTimeout(() => playNextVoice(), 300);
             };
         }
 
@@ -610,14 +614,12 @@
 
             handleLoop();
 
-            // Запуск голосовых
             if (!voiceActive && !allVoicesDone && t >= LOOP_START && currentVoiceIndex === 0) {
                 loopActive = true;
-                mainAudio.volume = 0.15; // тише, чем раньше
+                mainAudio.volume = 0.12;
                 playNextVoice();
             }
 
-            // Текст до голосовых
             if (t < LOOP_START && !allVoicesDone) {
                 let targetIndex = -1;
                 for (let i = lineTimings.length - 1; i >= 0; i--) {
@@ -668,7 +670,7 @@
                 if (mainAudio.currentTime >= LOOP_START) {
                     mainAudio.currentTime = LOOP_START;
                     loopActive = true;
-                    mainAudio.volume = 0.15;
+                    mainAudio.volume = 0.12;
                 }
 
                 mainAudio.play().then(() => {
@@ -679,7 +681,7 @@
 
                     if (mainAudio.currentTime >= LOOP_START && currentVoiceIndex === 0) {
                         loopActive = true;
-                        mainAudio.volume = 0.15;
+                        mainAudio.volume = 0.12;
                         playNextVoice();
                     }
                 }).catch(() => {
