@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Для тебя</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0a0a0a;
+            color: #e0e0e0;
+            font-family: 'Cormorant Garamond', 'Georgia', serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at center, transparent 20%, rgba(0,0,0,0.95) 100%),
+                radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.3), transparent),
+                radial-gradient(1px 1px at 40% 70%, rgba(255,255,255,0.2), transparent),
+                radial-gradient(1.5px 1.5px at 70% 20%, rgba(255,255,255,0.25), transparent),
+                radial-gradient(1px 1px at 85% 60%, rgba(255,255,255,0.2), transparent),
+                radial-gradient(1.5px 1.5px at 15% 80%, rgba(255,255,255,0.15), transparent),
+                radial-gradient(1px 1px at 60% 45%, rgba(255,255,255,0.3), transparent),
+                radial-gradient(1px 1px at 90% 90%, rgba(255,255,255,0.2), transparent),
+                radial-gradient(1.5px 1.5px at 35% 15%, rgba(255,255,255,0.25), transparent),
+                radial-gradient(1px 1px at 50% 55%, rgba(255,255,255,0.15), transparent);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle var(--dur) ease-in-out infinite;
+            animation-delay: var(--del);
+            opacity: 0;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: var(--op); transform: scale(1.2); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        .record-wrapper {
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            animation: spinRecord 6s linear infinite;
+            animation-play-state: paused;
+            box-shadow: 0 0 80px rgba(180, 160, 200, 0.08);
+            margin-bottom: 30px;
+            flex-shrink: 0;
+            transition: box-shadow 0.8s ease;
+        }
+
+        .record-wrapper.playing {
+            animation-play-state: running;
+            box-shadow: 0 0 100px rgba(180, 160, 200, 0.2);
+        }
+
+        .record-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #111;
+            border: 3px solid #2a2a2a;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .record-photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            opacity: 0.8;
+            filter: grayscale(20%) contrast(1.05) brightness(0.9);
+            transition: all 0.8s ease;
+        }
+
+        .record-wrapper.playing .record-photo {
+            opacity: 0.9;
+            filter: grayscale(0%) contrast(1.1) brightness(1);
+        }
+
+        .record-inner::after {
+            content: '';
+            position: absolute;
+            top: 5%;
+            left: 10%;
+            width: 45%;
+            height: 22%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 100%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        .record-label {
+            position: absolute;
+            width: 44px;
+            height: 44px;
+            background: #1a1a1a;
+            border-radius: 50%;
+            border: 2px solid #333;
+            z-index: 4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 8px;
+            color: #888;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 600;
+            transition: all 0.8s ease;
+        }
+
+        .record-wrapper.playing .record-label {
+            border-color: #6b4e8a;
+            color: #b09cc7;
+            box-shadow: 0 0 15px rgba(150, 120, 200, 0.3);
+        }
+
+        @keyframes spinRecord {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .text-container {
+            width: 100%;
+            min-height: 70px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .text-line {
+            position: absolute;
+            opacity: 0;
+            transform: translateY(12px) scale(0.96);
+            font-family: 'Playfair Display', 'Georgia', serif;
+            font-size: 1.25rem;
+            font-weight: 400;
+            font-style: italic;
+            line-height: 1.6;
+            color: #f5f0fa;
+            text-shadow: 0 2px 30px rgba(0,0,0,0.9), 0 0 40px rgba(200, 180, 220, 0.2);
+            transition: all 1s cubic-bezier(0.22, 0.61, 0.36, 1);
+            width: 100%;
+            padding: 0 15px;
+            pointer-events: none;
+            letter-spacing: 0.02em;
+        }
+
+        .text-line.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            text-shadow: 0 2px 30px rgba(0,0,0,0.9), 0 0 60px rgba(200, 180, 220, 0.35);
+        }
+
+        .text-line.hidden {
+            opacity: 0;
+            transform: translateY(-18px) scale(0.92);
+            filter: blur(3px);
+            transition: all 0.9s ease-in;
+        }
+
+        /* ===== ФИНАЛЬНЫЙ ТЕКСТ ===== */
+        .final-message {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 2.5s ease;
+        }
+
+        .final-message.show {
+            opacity: 1;
+        }
+
+        .final-message .final-line {
+            font-family: 'Playfair Display', 'Georgia', serif;
+            font-size: 2.2rem;
+            font-weight: 500;
+            font-style: italic;
+            color: #f8f0ff;
+            text-shadow: 0 0 60px rgba(220, 190, 255, 0.6), 0 0 120px rgba(200, 160, 240, 0.35);
+            text-align: center;
+            padding: 0 20px;
+            animation: finalGlow 3s ease-in-out infinite;
+        }
+
+        .final-message .final-sub {
+            font-family: 'Cormorant Garamond', 'Georgia', serif;
+            font-size: 1.3rem;
+            font-weight: 400;
+            font-style: italic;
+            color: #d5c8e8;
+            text-shadow: 0 0 30px rgba(180, 150, 210, 0.5);
+            margin-top: 16px;
+            text-align: center;
+            padding: 0 20px;
+            opacity: 0;
+            animation: subAppear 3s ease-in-out 1s forwards;
+        }
+
+        @keyframes finalGlow {
+            0%, 100% { text-shadow: 0 0 60px rgba(220, 190, 255, 0.6), 0 0 120px rgba(200, 160, 240, 0.35); }
+            50% { text-shadow: 0 0 90px rgba(240, 210, 255, 0.85), 0 0 160px rgba(220, 180, 250, 0.55); }
+        }
+
+        @keyframes subAppear {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .voice-indicator {
+            opacity: 0;
+            color: #b09cc7;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 0.9rem;
+            font-style: italic;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            transition: opacity 0.6s ease;
+            text-align: center;
+        }
+
+        .voice-indicator.show {
+            opacity: 1;
+        }
+
+        .play-btn {
+            position: relative;
+            z-index: 3;
+            background: rgba(25, 20, 35, 0.65);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(170, 150, 200, 0.3);
+            color: #d5cae8;
+            padding: 14px 44px;
+            font-family: 'Cormorant Garamond', 'Georgia', serif;
+            font-size: 1.1rem;
+            font-weight: 500;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.5s ease;
+            margin-top: 5px;
+        }
+
+        .play-btn:hover {
+            border-color: rgba(190, 170, 220, 0.5);
+            box-shadow: 0 0 35px rgba(150, 120, 200, 0.15);
+        }
+
+        .play-btn:active {
+            transform: scale(0.94);
+            background: rgba(35, 25, 50, 0.8);
+        }
+
+        .play-btn.playing {
+            border-color: rgba(180, 150, 220, 0.45);
+            background: rgba(35, 25, 50, 0.7);
+            color: #ede4f7;
+            box-shadow: 0 0 45px rgba(150, 120, 200, 0.25);
+            letter-spacing: 4px;
+        }
+
+        .timer {
+            color: rgba(255, 255, 255, 0.3);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            margin-top: 8px;
+            z-index: 3;
+        }
+
+        @media (max-width: 600px) {
+            .record-wrapper {
+                width: 200px;
+                height: 200px;
+                margin-bottom: 20px;
+            }
+            .text-line {
+                font-size: 1.1rem;
+            }
+            .play-btn {
+                padding: 12px 36px;
+                font-size: 1rem;
+            }
+            .record-label {
+                width: 36px;
+                height: 36px;
+                font-size: 7px;
+            }
+            .final-message .final-line {
+                font-size: 1.6rem;
+            }
+            .final-message .final-sub {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="particles" id="particles"></div>
+
+    <!-- Финальное сообщение -->
+    <div class="final-message" id="finalMessage">
+        <div class="final-line">я люблю тебя</div>
+        <div class="final-sub">всё будет хорошо</div>
+    </div>
+
+    <div class="container">
+
+        <!-- Пластинка -->
+        <div class="record-wrapper" id="recordWrapper">
+            <div class="record-inner">
+                <img src="photo.jpg" alt="Мы" class="record-photo" id="recordPhoto" onerror="this.style.display='none'; document.getElementById('fallbackLabel').style.display='flex';">
+                <div class="record-label" id="fallbackLabel" style="display: none;">♥</div>
+                <div class="record-label" id="recordLabel">LOVE</div>
+            </div>
+        </div>
+
+        <!-- Индикатор голосового -->
+        <div class="voice-indicator" id="voiceIndicator"></div>
+
+        <!-- Текст песни -->
+        <div class="text-container" id="textContainer"></div>
+
+        <!-- Кнопка -->
+        <button class="play-btn" id="playPauseBtn">Слушать</button>
+        <div class="timer" id="timer">00:00</div>
+    </div>
+
+    <!-- Основная песня -->
+    <audio id="mainSong" loop>
+        <source src="song.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Голосовые сообщения -->
+    <audio id="voice1" preload="auto"><source src="telegram_audio.ogg" type="audio/ogg"></audio>
+    <audio id="voice2" preload="auto"><source src="telegram_audio 2.ogg" type="audio/ogg"></audio>
+    <audio id="voice3" preload="auto"><source src="telegram_audio 3.ogg" type="audio/ogg"></audio>
+    <audio id="voice4" preload="auto"><source src="telegram_audio 4.ogg" type="audio/ogg"></audio>
+    <audio id="voice5" preload="auto"><source src="telegram_audio 5.ogg" type="audio/ogg"></audio>
+    <audio id="voice6" preload="auto"><source src="telegram_audio 6.ogg" type="audio/ogg"></audio>
+    <audio id="voice7" preload="auto"><source src="telegram_audio 7.ogg" type="audio/ogg"></audio>
+    <audio id="voice8" preload="auto"><source src="telegram_audio 8.ogg" type="audio/ogg"></audio>
+    <audio id="voice9" preload="auto"><source src="telegram_audio 9.ogg" type="audio/ogg"></audio>
+
+    <script>
+        // ========== ЧАСТИЦЫ ==========
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const p = document.createElement('div');
+                p.classList.add('particle');
+                const size = Math.random() * 2 + 0.8;
+                p.style.width = size + 'px';
+                p.style.height = size + 'px';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.top = Math.random() * 100 + '%';
+                p.style.setProperty('--dur', (Math.random() * 3 + 2) + 's');
+                p.style.setProperty('--del', Math.random() * 4 + 's');
+                p.style.setProperty('--op', Math.random() * 0.5 + 0.35);
+                container.appendChild(p);
+            }
+        }
+
+        // ========== ТЕКСТ ==========
+        const lines = [
+            "я хочу стать добрее",
+            "в голове только ты нет желания видеть людей",
+            "почему мы всегда ненадежные после полей",
+            "собирал все слова о любви но ты муза моя все по нолям",
+            "нету объятий и рук для любви не найти твой маяк",
+            "все не так может ты все-таки дашь понять что любовь хуета",
+            "во мне суета но тяну пальцы к тебе иногда",
+            "Прими меня",
+            "я в одинокого здесь явно тебя нет я есть",
+            "грустные танцы с музой в три ночи мой день",
+            "я просто из тех кто дальше будет на дне",
+            "дай мне согреть тебя",
+            "но ты уже не помнишь мои прикосновения",
+            "пусть узнаешь что тебе давно хватает тепла",
+            "все что пишется сейчас это знай лишь для продолжения",
+            "тебя тебя одну любить тебя одну любить",
+            "сеанс массового гипноза в глазах твоих",
+            "я как заноза все гоняю по кругу тех забытых двоих",
+            "одной тобой теперь им не нужного этого знать",
+            "здесь тебя меня и я нет",
+            "это все бред как быть добрей сука нет",
+            "говорят ломка эффект временный но уйду я с этим пусть и не намеренно",
+            "мы так подходим друг другу с дождем все так сыро и грустно в душе, и тебя слышишь ждем",
+            "губы манят меня не хочу без тебя не хочу тебя менять",
+            "стой куда ты ? Мне всего лишь тебя бы понять",
+            "Я страдаю под бит и мне не хватит мозгов тебя позабыть..."
+        ];
+
+        const lineTimings = [
+            15, 19, 26, 31, 38, 41, 47, 52, 54, 58,
+            63, 66, 69, 74, 78, 85, 99, 104, 110,
+            112, 115, 119, 124, 131, 137, 142
+        ];
+
+        const container = document.getElementById('textContainer');
+        const voiceIndicator = document.getElementById('voiceIndicator');
+        const finalMessage = document.getElementById('finalMessage');
+        let currentElement = null;
+        let lastShownIndex = -1;
+
+        function showLine(index) {
+            if (index === lastShownIndex) return;
+            if (index >= lines.length) return;
+
+            if (currentElement) {
+                currentElement.classList.remove('active');
+                currentElement.classList.add('hidden');
+                setTimeout(() => {
+                    if (currentElement && currentElement.classList.contains('hidden')) {
+                        currentElement.remove();
+                    }
+                }, 1000);
+            }
+
+            const newLine = document.createElement('div');
+            newLine.className = 'text-line';
+            newLine.textContent = lines[index];
+            container.appendChild(newLine);
+
+            requestAnimationFrame(() => {
+                newLine.classList.add('active');
+            });
+
+            currentElement = newLine;
+            lastShownIndex = index;
+        }
+
+        function resetText() {
+            if (currentElement) {
+                currentElement.remove();
+                currentElement = null;
+            }
+            lastShownIndex = -1;
+            container.innerHTML = '';
+            voiceIndicator.classList.remove('show');
+            voiceIndicator.textContent = '';
+            finalMessage.classList.remove('show');
+        }
+
+        function showFinalMessage() {
+            finalMessage.classList.add('show');
+            voiceIndicator.classList.remove('show');
+            voiceIndicator.textContent = '';
+        }
+
+        // ========== ГОЛОСОВЫЕ ==========
+        const voiceFiles = [];
+        for (let i = 1; i <= 9; i++) {
+            voiceFiles.push(document.getElementById('voice' + i));
+        }
+
+        let currentVoiceIndex = 0;
+        let voiceActive = false;
+        let allVoicesDone = false;
+
+        // Петля: 2:28 – 2:50
+        const LOOP_START = 148;  // 2:28
+        const LOOP_END = 170;    // 2:50
+
+        function stopAllVoices() {
+            voiceFiles.forEach(v => {
+                v.pause();
+                v.currentTime = 0;
+            });
+            voiceActive = false;
+            currentVoiceIndex = 0;
+            allVoicesDone = false;
+            voiceIndicator.classList.remove('show');
+            voiceIndicator.textContent = '';
+        }
+
+        function playNextVoice() {
+            if (currentVoiceIndex >= voiceFiles.length) {
+                // Все голосовые проиграны
+                voiceActive = false;
+                allVoicesDone = true;
+                loopActive = false;
+                mainAudio.volume = 0.75;
+                // Показываем финальный текст
+                showFinalMessage();
+                return;
+            }
+
+            const voice = voiceFiles[currentVoiceIndex];
+            voice.currentTime = 0;
+
+            voice.play().then(() => {
+                voiceActive = true;
+                allVoicesDone = false;
+                voiceIndicator.textContent = 'голосовое ' + (currentVoiceIndex + 1) + ' из 9';
+                voiceIndicator.classList.add('show');
+            }).catch(e => {
+                console.log('Ошибка воспроизведения голосового:', e);
+                currentVoiceIndex++;
+                playNextVoice();
+            });
+
+            voice.onended = () => {
+                currentVoiceIndex++;
+                playNextVoice();
+            };
+        }
+
+        // ========== ЗАЦИКЛИВАНИЕ ==========
+        let loopActive = false;
+
+        function handleLoop() {
+            if (!loopActive) return;
+            if (allVoicesDone) {
+                loopActive = false;
+                mainAudio.volume = 0.75;
+                return;
+            }
+            if (mainAudio.currentTime >= LOOP_END) {
+                mainAudio.currentTime = LOOP_START;
+            }
+        }
+
+        // ========== АУДИО И СИНХРОНИЗАЦИЯ ==========
+        const mainAudio = document.getElementById('mainSong');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const recordWrapper = document.getElementById('recordWrapper');
+        const timerEl = document.getElementById('timer');
+
+        mainAudio.volume = 0.75;
+
+        let syncInterval = null;
+
+        function formatTime(s) {
+            const m = Math.floor(s / 60);
+            const sec = Math.floor(s % 60);
+            return String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+        }
+
+        function syncLyrics() {
+            const t = mainAudio.currentTime;
+            timerEl.textContent = formatTime(t);
+
+            handleLoop();
+
+            // Запуск голосовых
+            if (!voiceActive && !allVoicesDone && t >= LOOP_START && currentVoiceIndex === 0) {
+                loopActive = true;
+                mainAudio.volume = 0.15; // тише, чем раньше
+                playNextVoice();
+            }
+
+            // Текст до голосовых
+            if (t < LOOP_START && !allVoicesDone) {
+                let targetIndex = -1;
+                for (let i = lineTimings.length - 1; i >= 0; i--) {
+                    if (t >= lineTimings[i]) {
+                        targetIndex = i;
+                        break;
+                    }
+                }
+                if (targetIndex >= 0 && targetIndex !== lastShownIndex) {
+                    showLine(targetIndex);
+                }
+            }
+        }
+
+        function startSync() {
+            stopSync();
+            syncLyrics();
+            syncInterval = setInterval(syncLyrics, 300);
+        }
+
+        function stopSync() {
+            if (syncInterval) {
+                clearInterval(syncInterval);
+                syncInterval = null;
+            }
+        }
+
+        function resetAll() {
+            stopSync();
+            stopAllVoices();
+            resetText();
+            loopActive = false;
+            mainAudio.volume = 0.75;
+            timerEl.textContent = '00:00';
+        }
+
+        // ========== КНОПКА ==========
+        playPauseBtn.addEventListener('click', () => {
+            if (mainAudio.paused) {
+                stopAllVoices();
+                resetText();
+                loopActive = false;
+                mainAudio.volume = 0.75;
+                currentVoiceIndex = 0;
+                voiceActive = false;
+                allVoicesDone = false;
+
+                if (mainAudio.currentTime >= LOOP_START) {
+                    mainAudio.currentTime = LOOP_START;
+                    loopActive = true;
+                    mainAudio.volume = 0.15;
+                }
+
+                mainAudio.play().then(() => {
+                    playPauseBtn.textContent = 'Пауза';
+                    playPauseBtn.classList.add('playing');
+                    recordWrapper.classList.add('playing');
+                    startSync();
+
+                    if (mainAudio.currentTime >= LOOP_START && currentVoiceIndex === 0) {
+                        loopActive = true;
+                        mainAudio.volume = 0.15;
+                        playNextVoice();
+                    }
+                }).catch(() => {
+                    alert('Нажми ещё раз, чтобы музыка заиграла 🎵');
+                });
+            } else {
+                mainAudio.pause();
+                stopAllVoices();
+                playPauseBtn.textContent = 'Слушать';
+                playPauseBtn.classList.remove('playing');
+                recordWrapper.classList.remove('playing');
+                stopSync();
+                loopActive = false;
+            }
+        });
+
+        mainAudio.addEventListener('ended', () => {
+            stopAllVoices();
+            playPauseBtn.textContent = 'Слушать';
+            playPauseBtn.classList.remove('playing');
+            recordWrapper.classList.remove('playing');
+            stopSync();
+            loopActive = false;
+            mainAudio.volume = 0.75;
+        });
+
+        mainAudio.addEventListener('timeupdate', () => {
+            handleLoop();
+        });
+
+        // ========== СТАРТ ==========
+        createParticles();
+    </script>
+</body>
+</html>
