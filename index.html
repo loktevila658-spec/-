@@ -554,6 +554,7 @@
 
             const voice = voiceFiles[currentVoiceIndex];
             voice.currentTime = 0;
+            voice.volume = 1.0;
 
             voice.play().then(() => {
                 voiceActive = true;
